@@ -14,6 +14,7 @@
 | [`paper-plugin/`](paper-plugin/) | `dist/BetterRecipeMemoryPlugin-26.2-1.jar` | **配套** —— 吞掉 datapack 造成的「孤兒成就」log 洪水(成就存檔開=可選;關=必裝,見 E4) |
 
 - 適用:Paper / MC 26.2(pack_format 107;其他版本見〔技術版〕的 pack_format 一節)
+- **Lecithin / MC 26.3(fork 26.3-1)**:`min_format`/`max_format` = 121(data 121.0),新增一次性版本補發成就;見下方〔Lecithin 26.3〕
 - 安裝:zip 丟進主世界 `datapacks/`;jar 丟進 `plugins/`;重啟生效
 - 實測:一台外掛數量龐大的 Paper 26.2 伺服器通過 —— `Loaded 1688 advancements → 127`、recipes 數不變、零載入錯誤
 
@@ -173,6 +174,25 @@ gamerule minecraft:limited_crafting     # 必須回 false(舊指令 gamerule doL
 - 回滾:刪 zip(+ jar)→ 重啟。玩家的配方解鎖會在遊玩中自然重新累積,無永久損失
 
 ---
+
+## Lecithin 26.3(fork 26.3-1)
+
+| 項目 | 26.3-1 |
+|---|---|
+| pack metadata | `min_format` 121 / `max_format` 121(26.3 `version.json` data 121.0;與核心內建 pack 同寫法,不再寫 `pack_format`) |
+| filter | 不變。26.3 仍是 `data/minecraft/advancement/recipes/`(1,740 檔);登錄表實測剩 224 條(含本包 2 條),`story/root` 等非配方成就保留 |
+| 新配方 | 26.3 比 26.2 多 457 個原版配方(178 個一般 + 279 個 brewing)。**已完成 `fallout:fill_recipe_book` 的老玩家不會再觸發它**,所以新增 `fallout:fill_recipe_book_26_3`(同樣隱形、`minecraft:tick`、reward = `fallout:fill_recipe_book`):每位玩家只觸發一次,之後永不重跑;新玩家兩個都會觸發,第二次 `recipe give @s *` 不會新增任何東西。`fill_recipe_book` 保留不動 |
+| 打包 | `python build-datapack.py` → `dist/BetterRecipeMemory.zip`(固定排序與時間戳,同源碼同 SHA-256;26.3-1 = `8e09da52…fc4d`) |
+| 配套外掛 | `dist/BetterRecipeMemoryPlugin-26.3-1.jar`:只加 `folia-supported: true`(不宣告時 Lecithin 會把它放進 Legacy Paper Runtime 的序列通道;toast 旗標必須在觸發呼叫內設好)。行為不變 |
+
+**Lecithin 上 function 的實際行為**(rig `function_command_enabled=false`,核心 tick 不跑 function tag):
+手動 `/function` 回 Unknown command;`#minecraft:load`(只印作者橫幅)不會執行;成就 reward 不經這兩者 ——
+`ServerPlayer.tick → CriteriaTriggers.TICK → PlayerAdvancements.award → AdvancementRewards.grant →
+ServerFunctionManager.execute`(bytecode 核對,無 Lecithin 開關;Leaves 假人在 `award` 入口就被排除)。
+實機以同一組參數呼叫 `ServerFunctionManager.execute` 會執行 datapack function。補發路徑沒有受阻,所以不需要外掛代補。
+
+**未驗**:真實 26.3 玩家端(新玩家/老玩家實際拿到新配方、重登與重啟不重複、首登沒有 toast)——rig 的 ViaVersion
+不支援 26.3、Leaves 假人不累積成就也不持有配方,只能用 26.3 原生客戶端驗收。
 
 ## 三、給 AI 的結構化脈絡(machine-oriented)
 

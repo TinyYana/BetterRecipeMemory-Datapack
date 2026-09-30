@@ -1,0 +1,8 @@
+{
+  "criteria": {
+    "on_first_seen_26_3": {"trigger": "minecraft:tick"}
+  },
+  "rewards": {
+    "function": "fallout:fill_recipe_book"
+  }
+}

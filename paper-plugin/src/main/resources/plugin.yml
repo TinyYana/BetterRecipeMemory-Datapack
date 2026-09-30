@@ -3,6 +3,10 @@ main: io.github.kuohsuanlo.betterrecipememory.BetterRecipeMemoryPlugin
 version: ${version}
 api-version: '1.21'
 load: STARTUP
+# Lecithin/Folia: stateless listener (per-event flag) + log4j filter + command — thread-agnostic, so it runs
+# natively instead of under the Legacy Paper Runtime's serial lane (the toast flag must be set inside the
+# firing call, on the player's own region thread).
+folia-supported: true
 description: Companion plugin for the BetterRecipeMemory datapack - suppresses the one-time orphan recipe-advancement cleanup log flood.
 author: kuohsuanlo
 website: https://github.com/kuohsuanlo/BetterRecipeMemory-Datapack
